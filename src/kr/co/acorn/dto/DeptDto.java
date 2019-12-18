@@ -1,11 +1,10 @@
 package kr.co.acorn.dto;
 
 public class DeptDto {
-	
 	private int no;
 	private String name;
 	private String loc;
-	
+
 	public DeptDto() {
 		super();
 		// TODO Auto-generated constructor stub
@@ -41,5 +40,9 @@ public class DeptDto {
 	public void setLoc(String loc) {
 		this.loc = loc;
 	}
-
+	
 }
+
+
+
+

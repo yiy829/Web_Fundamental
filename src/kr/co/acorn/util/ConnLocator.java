@@ -9,7 +9,7 @@ import javax.naming.NamingException;
 import javax.sql.DataSource;
 
 public class ConnLocator {
-	public static Connection getConnection() {
+	public static Connection getConnection() throws SQLException {
 		DataSource ds = null;
 		Connection con = null;
 		try {
@@ -19,10 +19,7 @@ public class ConnLocator {
 		} catch (NamingException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
-		} catch (SQLException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+		} 
 		return con;
 	} // 앞으로 ConnLocator.getConnection() 으로 db 연결하기. close로 반납
 }
