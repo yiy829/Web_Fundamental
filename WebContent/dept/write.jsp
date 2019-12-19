@@ -8,7 +8,18 @@
 	</ol>
 </nav>
 <!-- breadcrumb end-->
-
+<%
+	int cPage = 0;
+	String tempPage = request.getParameter("page");
+	if (tempPage == null || tempPage.length() == 0) {
+		cPage = 1;
+	}
+	try {
+		cPage = Integer.parseInt(tempPage);
+	} catch (NumberFormatException e) {
+		cPage = 1;
+	}
+%>
 <!-- main start -->
 <div class="container">
 	<div class="row">
@@ -34,9 +45,9 @@
 					</div>
 				</div>
 			</form>
-			<div class = "text-right">
-			<a href="list.jsp" class="btn btn-outline-primary">목록</a>
-			<button type="button" id="saveDept" class="btn btn-outline-success">저장</button>
+			<div class="text-right">
+				<a href="list.jsp?page=<%=cPage %>" class="btn btn-outline-primary">목록</a>
+				<button type="button" id="saveDept" class="btn btn-outline-success">저장</button>
 			</div>
 		</div>
 	</div>
@@ -45,26 +56,26 @@
 <%@ include file="../inc/footer.jsp"%>
 
 <script>
-$(function(){
-	$("#no").focus();
-	$("#saveDept").click(function(){
-		//자바스크립트 유효성 검사
-		if($("#no").val().length==0){
-			alert("부서번호를 입력하세요.");
-			$("#no").focus();
-			return;
-		}
-		if($("#name").val().length==0){
-			alert("부서명을 입력하세요.");
-			$("#name").focus();
-			return;
-		}
-		if($("#loc").val().length==0){
-			alert("부서위치를 입력하세요.");
-			$("#loc").focus();
-			return;
-		}
-		f.submit();		
+	$(function() {
+		$("#no").focus();
+		$("#saveDept").click(function() {
+			//자바스크립트 유효성 검사
+			if ($("#no").val().length == 0) {
+				alert("부서번호를 입력하세요.");
+				$("#no").focus();
+				return;
+			}
+			if ($("#name").val().length == 0) {
+				alert("부서명을 입력하세요.");
+				$("#name").focus();
+				return;
+			}
+			if ($("#loc").val().length == 0) {
+				alert("부서위치를 입력하세요.");
+				$("#loc").focus();
+				return;
+			}
+			f.submit();
+		});
 	});
-});
 </script>
