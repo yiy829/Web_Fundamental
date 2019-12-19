@@ -238,5 +238,44 @@ public class DeptDao {
 
 		return isSuccess;
 	}
+	
+	public boolean delete(int no) {
+		boolean isSuccess = false;
+		
+		Connection con = null;
+		PreparedStatement pstmt = null;
+		
+		try {
+			con = ConnLocator.getConnection();
+			StringBuffer sql = new StringBuffer();
+			sql.append("DELETE FROM dept WHERE deptno = ? ");
+			
+			pstmt = con.prepareStatement(sql.toString());
+			int index = 0;
+			pstmt.setInt(++index, no);
+			
+			pstmt.executeUpdate();
+			
+			isSuccess = true;
+			
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} finally {
+			try {
+				if (pstmt != null)
+					pstmt.close();
+				if (con != null)
+					con.close();
 
+			} catch (SQLException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
+				
+		return isSuccess;
+	}
+	
+	
 }

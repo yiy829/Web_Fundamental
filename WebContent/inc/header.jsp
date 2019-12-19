@@ -12,18 +12,24 @@
     
     <!-- Navbar Start -->
     <nav class="navbar navbar-expand-lg navbar-dark" style="background-color: #563d7c;"  >
-        <a class="navbar-brand" href="/index.jsp">Home</a> <!-- 최상위 인데스 jsp 호출 -->
+        <a class="navbar-brand" href="/index.jsp">HELLO</a> <!-- 최상위 인데스 jsp 호출 -->
         <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarTogglerDemo02" aria-controls="navbarTogglerDemo02" aria-expanded="false" aria-label="Toggle navigation">
           <span class="navbar-toggler-icon"></span>
         </button>
-      
+      	<%
+      		// /dept/list.jsp,	/emp/list.jsp,	/notice/list.jsp
+      		String uri = request.getRequestURI();
+      	%>
         <div class="collapse navbar-collapse" id="navbarTogglerDemo02">
           <ul class="navbar-nav mr-auto mt-2 mt-lg-0">
-            <li class="nav-item active">
-              <a class="nav-link" href="#">부서관리 <span class="sr-only">(current)</span></a>
+            <li class="nav-item <%if(uri.startsWith("/dept")){%>active<%}%>">
+              <a class="nav-link" href="/dept/list.jsp">부서관리 <span class="sr-only">(current)</span></a>
             </li>
-            <li class="nav-item">
-              <a class="nav-link" href="#">공지사항</a>
+             <li class="nav-item <%if(uri.startsWith("/emp")){%>active<%}%>">
+              <a class="nav-link" href="/emp/list.jsp">사원관리 <span class="sr-only">(current)</span></a>
+            </li>
+            <li class="nav-item <%if(uri.startsWith("/notice")){%>active<%}%>">
+              <a class="nav-link" href="/notice/list.jsp">공지사항</a>
             </li>
             
           </ul>
