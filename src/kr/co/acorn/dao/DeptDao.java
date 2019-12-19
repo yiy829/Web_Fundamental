@@ -152,4 +152,91 @@ public class DeptDao {
 		return isSuccess;
 	}
 
+	public DeptDto select(int no) {
+		DeptDto dto = null;
+
+		Connection con = null;
+		PreparedStatement pstmt = null;
+		ResultSet rs = null;
+
+		try {
+			con = ConnLocator.getConnection();
+			StringBuffer sql = new StringBuffer();
+			sql.append("SELECT deptno, dname, loc ");
+			sql.append("FROM dept ");
+			sql.append("WHERE deptno = ? ");
+
+			pstmt = con.prepareStatement(sql.toString());
+			int index = 0;
+			pstmt.setInt(++index, no);
+
+			rs = pstmt.executeQuery();
+			if (rs.next()) {
+				index = 0;
+				no = rs.getInt(++index);
+				String name = rs.getString(++index);
+				String loc = rs.getString(++index);
+				dto = new DeptDto(no, name, loc);
+			}
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} finally {
+			try {
+				if (rs != null)
+					rs.close();
+				if (pstmt != null)
+					pstmt.close();
+				if (con != null)
+					con.close();
+
+			} catch (SQLException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
+
+		return dto;
+	}
+
+	public boolean update(DeptDto dto) {
+		boolean isSuccess = false;
+		Connection con = null;
+		PreparedStatement pstmt = null;
+
+		try {
+			con = ConnLocator.getConnection();
+			StringBuffer sql = new StringBuffer();
+			sql.append("UPDATE dept ");
+			sql.append("SET dname = ?, loc = ? ");
+			sql.append("WHERE deptno = ? ");
+			
+			pstmt = con.prepareStatement(sql.toString());
+			int index = 0;
+			pstmt.setString(++index, dto.getName());
+			pstmt.setString(++index, dto.getLoc());
+			pstmt.setInt(++index, dto.getNo());
+			
+			pstmt.executeUpdate();
+			isSuccess = true;
+			
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} finally {
+			try {
+				if (pstmt != null)
+					pstmt.close();
+				if (con != null)
+					con.close();
+
+			} catch (SQLException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
+
+		return isSuccess;
+	}
+
 }

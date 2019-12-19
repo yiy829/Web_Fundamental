@@ -36,15 +36,17 @@
 	
 	
 	//An = a1 + (n-1)*d : 등차수열
-	start = (cPage - 1) * len;
-	DeptDao dao = DeptDao.getInstance();
-	
+	DeptDao dao = DeptDao.getInstance();	
 	totalRows = dao.getTotalRows();
 	totalPage = totalRows%len == 0 ? totalRows/len : totalRows/len+1;
 	if(totalPage == 0){
 		totalPage = 1;
 	}
+	if(cPage>totalPage){
+		totalPage = 1;
+	}
 	
+	start = (cPage - 1) * len;
 	pageNum = totalRows - (cPage-1)*(len);
 	/*
 	An = a1 + (n-1)*d
