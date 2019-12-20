@@ -1,5 +1,5 @@
-<%@page import="kr.co.acorn.dto.DeptDto"%>
-<%@page import="kr.co.acorn.dao.DeptDao"%>
+<%@page import="kr.co.acorn.dto.EmpDto"%>
+<%@page import="kr.co.acorn.dao.EmpDao"%>
 
 <%@ page pageEncoding="utf-8"%>
 <%@ include file="../inc/header.jsp"%>
@@ -36,14 +36,19 @@
 		return;
 	}
 
-	DeptDao dao = DeptDao.getInstance();
-	DeptDto dto = dao.select(no);
+	EmpDao dao = EmpDao.getInstance();
+	EmpDto dto = dao.select(no);
 	if (dto == null) {
 		response.sendRedirect("list.jsp?page=" + cPage);
 		return;
 	}
 	String name = dto.getName();
-	String loc = dto.getLoc();
+	String job = dto.getJob();
+	int mgr = dto.getMgr();
+	String hiredate = dto.getHiredate();
+	int sal = dto.getSal();
+	int comm = dto.getComm();
+	int deptNo = dto.getDeptDto().getNo();
 %>
 <!-- main start -->
 <div class="container">
@@ -54,50 +59,55 @@
 				<div class="form-group row">
 					<label for="no" class="col-sm-2 col-form-label">사원번호</label>
 					<div class="col-sm-10">
-						<input type="number" class="form-control" id="no" name="no">
+						<input type="number" class="form-control" id="no" readonly = "readonly" name="no" value="<%=no%>">
 					</div>
 				</div>
 				<div class="form-group row">
 					<label for="name" class="col-sm-2 col-form-label">이름</label>
 					<div class="col-sm-10">
-						<input type="text" class="form-control" id="name" name="name">
+						<input type="text" class="form-control" id="name" name="name" value="<%=name%>">
 					</div>
 				</div>
 				<div class="form-group row">
 					<label for="job" class="col-sm-2 col-form-label">직책</label>
 					<div class="col-sm-10">
-						<input type="text" class="form-control" id="job" name="job">
+						<input type="text" class="form-control" id="job" name="job" value="<%=job%>">
 					</div>
 				</div>
 				<div class="form-group row">
 					<label for="mgr" class="col-sm-2 col-form-label">사수</label>
 					<div class="col-sm-10">
-						<input type="number" class="form-control" id="mgr" name="mgr">
+						<input type="number" class="form-control" id="mgr" name="mgr" value="<%=mgr%>">
+					</div>
+				</div>
+				<div class="form-group row">
+					<label for="hiredate" class="col-sm-2 col-form-label">입사날짜</label>
+					<div class="col-sm-10">
+						<input type="text" class="form-control" id="hiredate" readonly = "readonly" name="hiredate" value="<%=hiredate%>">
 					</div>
 				</div>
 				<div class="form-group row">
 					<label for="sal" class="col-sm-2 col-form-label">월급</label>
 					<div class="col-sm-10">
-						<input type="number" class="form-control" id="sal" name="sal">
+						<input type="number" class="form-control" id="sal" name="sal" value="<%=sal%>">
 					</div>
 				</div>
 				<div class="form-group row">
 					<label for="comm" class="col-sm-2 col-form-label">상여금</label>
 					<div class="col-sm-10">
-						<input type="number" class="form-control" id="comm" name="comm">
+						<input type="number" class="form-control" id="comm" name="comm" value="<%=comm%>">
 					</div>
 				</div>
 				<div class="form-group row">
 					<label for="deptNo" class="col-sm-2 col-form-label">부서번호</label>
 					<div class="col-sm-10">
-						<input type="number" class="form-control" id="deptNo"
-							name="deptNo">
+						<input type="number" class="form-control" id="deptNo" name="deptNo" value="<%=deptNo%>">
 					</div>
 				</div>
-				<input type="hidden" name="page" value="<%=cPage%>" />
+				<input type="hidden" name="page" value="<%=cPage%>" /> <!-- 밑에 cPage 넣지않게 사용 -->
 			</form>
 			<div class="text-right">
-				<a href="list.jsp?page=<%=cPage%>" class="btn btn-outline-primary">목록</a>
+				<a href="list.jsp" class="btn btn-outline-primary">목록</a>
 				<button type="button" id="updateEmp" class="btn btn-outline-success">수정</button>
 				<button type="button" id="deleteEmp" class="btn btn-outline-danger">삭제</button>
 			</div>
@@ -112,11 +122,7 @@
 		$("#no").focus();
 		$("#updateEmp").click(function() {
 			//자바스크립트 유효성 검사
-			if ($("#no").val().length == 0) {
-				alert("사원번호를 입력하세요.");
-				$("#no").focus();
-				return;
-			}
+			
 			if ($("#name").val().length == 0) {
 				alert("이름을 입력하세요.");
 				$("#name").focus();

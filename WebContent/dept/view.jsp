@@ -79,7 +79,7 @@
 				<input type="hidden" name="page" value="<%=cPage%>" />
 			</form>
 			<div class = "text-right">
-			<a href="list.jsp?page=<%=cPage%>" class="btn btn-outline-primary">목록</a>
+			<button type="button" id="prevPage" class="btn btn-outline-primary">이전</button>
 			<button type="button" id="updateDept" class="btn btn-outline-success">수정</button>
 			<button type="button" id="deleteDept" class="btn btn-outline-danger">삭제</button>
 			</div>
@@ -92,6 +92,9 @@
 <script>
 $(function(){
 	$("#no").focus();
+	$("#prevPage").click(function(){
+		history.back(-1);
+		});
 	$("#updateDept").click(function(){
 		//자바스크립트 유효성 검사
 		if($("#no").val().length==0){

@@ -1,7 +1,7 @@
 <%@ page pageEncoding="utf-8"%>
 <!-- footer start -->
-<footer class="bg-dark bd-footer fixed-bottom"
-	style="color: white; padding: 0.3em;">
+<footer class="bg-dark bd-footer" style="color: white; padding: 0.3em; margin-top : 1em;"> 
+<!-- fixed-bottom -->	<!-- margin-top : 1em; -->
 	<div class="container-fluid text-center">
 		<p>
 			Designed and built with all the love in the world by the <a
