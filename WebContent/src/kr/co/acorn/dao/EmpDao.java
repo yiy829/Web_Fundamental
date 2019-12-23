@@ -6,23 +6,26 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 
+import org.json.simple.JSONArray;
+import org.json.simple.JSONObject;
+
 import kr.co.acorn.dto.DeptDto;
 import kr.co.acorn.dto.EmpDto;
-import kr.co.acorn.dto.MemberDto;
 import kr.co.acorn.util.ConnLocator;
 
-public class MemberDao {
-	private static MemberDao single;
+public class EmpDao {
+	private static EmpDao single;
 
-	private MemberDao() {
+	private EmpDao() {
 	}
 
-	public static MemberDao getInstance() {
+	public static EmpDao getInstance() {
 		if (single == null) {
-			single = new MemberDao();
+			single = new EmpDao();
 		}
 		return single;
 	}
+
 	public int getTotalRows() {
 		int count = 0;
 
@@ -33,8 +36,8 @@ public class MemberDao {
 		try {
 			con = ConnLocator.getConnection();
 			StringBuffer sql = new StringBuffer();
-			sql.append("SELECT COUNT(m_email) ");
-			sql.append("FROM member ");
+			sql.append("SELECT COUNT(empno) ");
+			sql.append("FROM emp ");
 
 			pstmt = con.prepareStatement(sql.toString());
 			int index = 0;
@@ -65,51 +68,8 @@ public class MemberDao {
 		return count;
 	}
 
-	public boolean isEmail(String email) {
-		boolean isSuccess = false;
-		
-		Connection con = null;
-		PreparedStatement pstmt = null;
-		ResultSet rs = null;
-		
-		try {
-			con = ConnLocator.getConnection();
-			StringBuffer sql = new StringBuffer();
-			sql.append("SELECT m_email ");
-			sql.append("FROM member ");
-			sql.append("WHERE m_email = ? ");
-			
-			pstmt = con.prepareStatement(sql.toString());
-			int index = 0;
-			pstmt.setString(++index, email);
-			rs = pstmt.executeQuery();
-			if (rs.next()) {
-				index = 0;
-				isSuccess = true;
-			}
-		} catch (SQLException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} finally {
-			try {
-				if (rs != null)
-					rs.close();
-				if (pstmt != null)
-					pstmt.close();
-				if (con != null)
-					con.close();
-				
-			} catch (SQLException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-		}
-		
-		return isSuccess;
-	}
-	
-	public ArrayList<MemberDto> select(int start, int len) {
-		ArrayList<MemberDto> list = new ArrayList<MemberDto>();
+	public ArrayList<EmpDto> select(int start, int len) {
+		ArrayList<EmpDto> list = new ArrayList<EmpDto>();
 
 		Connection con = null;
 		PreparedStatement pstmt = null;
@@ -118,9 +78,10 @@ public class MemberDao {
 		try {
 			con = ConnLocator.getConnection();
 			StringBuffer sql = new StringBuffer();
-			sql.append("SELECT m_email, m_name, m_pwd, m_phone, DATE_FORMAT(m_regdate, '%Y/%m/%d') ");
-			sql.append("FROM member ");
-			sql.append("ORDER BY m_regdate DESC ");
+			sql.append("SELECT empno, ename, job, mgr, dname, e.DEPTNO, DATE_FORMAT(hiredate, '%Y/%m/%d') ");
+			sql.append("FROM emp e, dept d ");
+			sql.append("WHERE d.deptno = e.deptno ");
+			sql.append("ORDER BY hiredate DESC, empno desc ");
 			sql.append("LIMIT ?, ? ");
 
 			pstmt = con.prepareStatement(sql.toString());
@@ -131,12 +92,15 @@ public class MemberDao {
 			DeptDto deptDto = null;
 			while (rs.next()) {
 				index = 0;
-				String email = rs.getString(++index);
+				int no = rs.getInt(++index);
 				String name = rs.getString(++index);
-				String pwd = rs.getString(++index);
-				String phone = rs.getString(++index);
-				String regdate = rs.getString(++index);
-				list.add(new MemberDto(email, name, pwd, phone, regdate)); // 따로 생성자를 만들어줘야 함
+				String job = rs.getString(++index);
+				int mgr = rs.getInt(++index);
+				String dname = rs.getString(++index);
+				int deptNo = rs.getInt(++index);
+				deptDto = new DeptDto(deptNo, dname, null);
+				String hiredate = rs.getString(++index);
+				list.add(new EmpDto(no, name, job, mgr, hiredate, deptDto)); // 따로 생성자를 만들어줘야 함
 			}
 		} catch (SQLException e) {
 			// TODO Auto-generated catch block
@@ -159,36 +123,90 @@ public class MemberDao {
 		return list;
 	}
 	
-	public MemberDto select(String email) {
-		MemberDto dto = null;
+	public String selectJson(int start, int len) {
+		JSONObject jsonObj = new JSONObject();
+		JSONArray jsonArray = new JSONArray();
+		
 		
 		Connection con = null;
 		PreparedStatement pstmt = null;
 		ResultSet rs = null;
-		
+
 		try {
 			con = ConnLocator.getConnection();
 			StringBuffer sql = new StringBuffer();
-			sql.append("SELECT m_email, m_name, m_pwd, m_phone, DATE_FORMAT(m_regdate, '%Y/%m/%d') ");
-			sql.append("FROM member ");
-			sql.append("WHERE m_email = ? ");
-			
+			sql.append("SELECT empno, ename, job, mgr, dname, e.DEPTNO, DATE_FORMAT(hiredate, '%Y/%m/%d') ");
+			sql.append("FROM emp e, dept d ");
+			sql.append("WHERE d.deptno = e.deptno ");
+			sql.append("ORDER BY hiredate DESC, empno desc ");
+			sql.append("LIMIT ?, ? ");
+
 			pstmt = con.prepareStatement(sql.toString());
 			int index = 0;
-			pstmt.setString(++index, email);
+			pstmt.setInt(++index, start);
+			pstmt.setInt(++index, len);
+			rs = pstmt.executeQuery();
+			DeptDto deptDto = null;
+			JSONObject item = null;
 			
+			while (rs.next()) {
+				index = 0;
+				int no = rs.getInt(++index);
+				String name = rs.getString(++index);
+				
+				String job = rs.getString(++index);
+				int mgr = rs.getInt(++index);
+				String dname = rs.getString(++index);
+				int deptNo = rs.getInt(++index);
+				deptDto = new DeptDto(deptNo, dname, null);
+				String hiredate = rs.getString(++index);
+				
+				item = new JSONObject();
+				item.put("no", no);
+				item.put("name", name );
+				jsonArray.add(item);
+			}
+			jsonObj.put("items",jsonArray);
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} finally {
+			try {
+				if (rs != null)
+					rs.close();
+				if (pstmt != null)
+					pstmt.close();
+				if (con != null)
+					con.close();
+
+			} catch (SQLException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
+
+		return jsonObj.toString();
+	}
+
+	public int getMaxNextNo() {
+		int result = 0;
+
+		Connection con = null;
+		PreparedStatement pstmt = null;
+		ResultSet rs = null;
+
+		try {
+			con = ConnLocator.getConnection();
+			StringBuffer sql = new StringBuffer();
+			sql.append("SELECT IFNULL(MAX(empno) +1,1) ");
+			sql.append("FROM emp ");
+
+			pstmt = con.prepareStatement(sql.toString());
+			int index = 0;
 			rs = pstmt.executeQuery();
 			if (rs.next()) {
 				index = 0;
-				email = rs.getString(++index);
-				String name = rs.getString(++index);
-				String pwd = rs.getString(++index);
-				String phone = rs.getString(++index);
-				String regdate = rs.getString(++index);
-				/*
-				 * DeptDto deptDto = new DeptDto(deptNo, null, null); // null은 name, loc
-				 */				
-				dto = new MemberDto(email, name, pwd, phone, regdate);
+				result = rs.getInt(++index);
 			}
 		} catch (SQLException e) {
 			// TODO Auto-generated catch block
@@ -201,17 +219,116 @@ public class MemberDao {
 					pstmt.close();
 				if (con != null)
 					con.close();
-				
+
 			} catch (SQLException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
 		}
-		
+
+		return result;
+	}
+
+	public boolean insert(EmpDto dto) {
+		boolean isSuccess = false;
+
+		Connection con = null;
+		PreparedStatement pstmt = null;
+
+		try {
+			con = ConnLocator.getConnection();
+			StringBuffer sql = new StringBuffer();
+			sql.append("INSERT INTO emp(empno, ename, job, mgr, hiredate, sal, comm, deptno) ");
+			sql.append("VALUES(?, ?, ?, ?, CURDATE(), ?, ?, ?) ");
+
+			pstmt = con.prepareStatement(sql.toString());
+			int index = 0;
+			pstmt.setInt(++index, dto.getNo());
+			pstmt.setString(++index, dto.getName());
+			pstmt.setString(++index, dto.getJob());
+			pstmt.setInt(++index, dto.getMgr());
+			pstmt.setInt(++index, dto.getSal());
+			pstmt.setInt(++index, dto.getComm());
+			pstmt.setInt(++index, dto.getDeptDto().getNo());
+
+			pstmt.executeUpdate();
+
+			isSuccess = true;
+
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} finally {
+			try {
+				if (pstmt != null)
+					pstmt.close();
+				if (con != null)
+					con.close();
+
+			} catch (SQLException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+
+		}
+		return isSuccess;
+	}
+
+	public EmpDto select(int no) {
+		EmpDto dto = null;
+
+		Connection con = null;
+		PreparedStatement pstmt = null;
+		ResultSet rs = null;
+
+		try {
+			con = ConnLocator.getConnection();
+			StringBuffer sql = new StringBuffer();
+			sql.append("SELECT empno, ename, job, mgr, DATE_FORMAT(hiredate, '%Y/%m/%d'), ");
+			sql.append("sal, comm, deptno ");
+			sql.append("FROM emp ");
+			sql.append("WHERE empno = ? ");
+
+			pstmt = con.prepareStatement(sql.toString());
+			int index = 0;
+			pstmt.setInt(++index, no);
+
+			rs = pstmt.executeQuery();
+			if (rs.next()) {
+				index = 0;
+				no = rs.getInt(++index);
+				String name = rs.getString(++index);
+				String job = rs.getString(++index);
+				int mgr = rs.getInt(++index);
+				String hiredate = rs.getString(++index);
+				int sal = rs.getInt(++index);
+				int comm = rs.getInt(++index);
+				int deptNo = rs.getInt(++index);
+				DeptDto deptDto = new DeptDto(deptNo, null, null); // null은 name, loc
+				dto = new EmpDto(no, name, job, mgr, hiredate, sal, comm, deptDto);
+			}
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} finally {
+			try {
+				if (rs != null)
+					rs.close();
+				if (pstmt != null)
+					pstmt.close();
+				if (con != null)
+					con.close();
+
+			} catch (SQLException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
+
 		return dto;
 	}
-	
-	public boolean insert(MemberDto dto) {
+
+	public boolean update(EmpDto dto) {
 		boolean isSuccess = false;
 
 		Connection con = null;
@@ -220,16 +337,19 @@ public class MemberDao {
 		try {
 			con = ConnLocator.getConnection();
 			StringBuffer sql = new StringBuffer();
-			sql.append("INSERT INTO member(m_email, m_name, m_pwd, m_phone) ");
-			sql.append("VALUES(?, ?, ?, ?) ");
-			
+			sql.append("UPDATE emp ");
+			sql.append("SET ename = ?, job = ?, mgr = ?, sal = ?, comm = ?, deptno = ? ");
+			sql.append("WHERE empno = ? ");
 
 			pstmt = con.prepareStatement(sql.toString());
 			int index = 0;
-			pstmt.setString(++index, dto.getEmail());
 			pstmt.setString(++index, dto.getName());
-			pstmt.setString(++index, dto.getPassword());
-			pstmt.setString(++index, dto.getPhone());
+			pstmt.setString(++index, dto.getJob());
+			pstmt.setInt(++index, dto.getMgr());
+			pstmt.setInt(++index, dto.getSal());
+			pstmt.setInt(++index, dto.getComm());
+			pstmt.setInt(++index, dto.getDeptDto().getNo());
+			pstmt.setInt(++index, dto.getNo());
 
 			pstmt.executeUpdate();
 
@@ -254,50 +374,7 @@ public class MemberDao {
 		return isSuccess;
 	}
 	
-	public boolean update(MemberDto dto) {
-		boolean isSuccess = false;
-
-		Connection con = null;
-		PreparedStatement pstmt = null;
-
-		try {
-			con = ConnLocator.getConnection();
-			StringBuffer sql = new StringBuffer();
-			sql.append("UPDATE member ");
-			sql.append("SET m_name = ?, m_pwd = ?, m_phone = ? ");
-			sql.append("WHERE m_email = ? ");
-
-			pstmt = con.prepareStatement(sql.toString());
-			int index = 0;
-			pstmt.setString(++index, dto.getName());
-			pstmt.setString(++index, dto.getPassword());
-			pstmt.setString(++index, dto.getPhone());
-			pstmt.setString(++index, dto.getEmail());
-
-			pstmt.executeUpdate();
-
-			isSuccess = true;
-
-		} catch (SQLException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} finally {
-			try {
-				if (pstmt != null)
-					pstmt.close();
-				if (con != null)
-					con.close();
-
-			} catch (SQLException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-
-		}
-		return isSuccess;
-	}
-	
-	public boolean delete(String email) {
+	public boolean delete(int no) {
 		boolean isSuccess = false;
 		
 		Connection con = null;
@@ -306,11 +383,11 @@ public class MemberDao {
 		try {
 			con = ConnLocator.getConnection();
 			StringBuffer sql = new StringBuffer();
-			sql.append("DELETE FROM member WHERE m_email = ? ");
+			sql.append("DELETE FROM emp WHERE empno = ? ");
 			
 			pstmt = con.prepareStatement(sql.toString());
 			int index = 0;
-			pstmt.setString(++index, email);
+			pstmt.setInt(++index, no);
 			
 			pstmt.executeUpdate();
 			
@@ -325,15 +402,14 @@ public class MemberDao {
 					pstmt.close();
 				if (con != null)
 					con.close();
-
-			} catch (SQLException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-		}
 				
+			} catch (SQLException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			
+		}
 		return isSuccess;
 	}
-	
 	
 }

@@ -1,3 +1,4 @@
+<%@page import="java.text.SimpleDateFormat"%>
 <%@page import="java.util.Calendar"%>
 <%@page import="java.io.IOException"%>
 <%@page import="org.jsoup.Jsoup"%>
@@ -31,14 +32,15 @@
 	if (bcoin == null) {
 		bcoin = "bitcoin";
 	}
-	String sDate = request.getParameter("startDate");
+	String sDate = request.getParameter("datepicker1");
 	if (sDate == null) {
 		sDate = "20190101";
 	}
-	String eDate = request.getParameter("endDate");
-	if (bcoin == null) {
+	String eDate = request.getParameter("datepicker2");
+	if (eDate == null) {
 		eDate = "20191220";
 	}
+	String eDate2 = Integer.toString((Integer.parseInt(eDate) -1)); 
 %>
 <!-- breadcrumb start-->
 <nav aria-label="breadcrumb">
@@ -75,13 +77,13 @@
 				<html>
 <body>
 	<p>
-		시작날짜 : <input type="text" id="datepicker1" />
+		시작날짜 : <input type="text" id="datepicker1" name="datepicker1" />
 	</p>
 	<p>
-		끝날짜 : <input type="text" id="datepicker2" />
+		끝날짜 : <input type="text" id="datepicker2" name="datepicker2"/>
 	</p>
 	<script type='text/javascript'>
-		$.datepicker.setDefaults({
+		$.datepicker.setDefaults({	
 			dateFormat : 'yymmdd',
 			prevText : '이전 달',
 			nextText : '다음 달',
@@ -134,7 +136,7 @@
 					</thead>
 					<tbody>
 						<%
-							String url = "https://coinmarketcap.com/currencies/" + bcoin + "/historical-data/?start=" + sDate + "&end=" + eDate;
+							String url = "https://coinmarketcap.com/currencies/" + bcoin + "/historical-data/?start=" + sDate + "&end=" + eDate2;
 							Document doc = null;
 							try {
 								doc = Jsoup.connect(url).get();
@@ -143,8 +145,13 @@
 								e.printStackTrace();
 							}
 							Elements elements = doc.select(".cmc-table__table-wrapper-outer table tbody tr");
-							for (int i = 0; i < elements.size(); i++) {
-								Element trElement = elements.get(i);
+								
+							if (elements.size() != 0) {
+								
+								for (int i = 0; i < elements.size(); i++) {
+									Element trElement = elements.get(i);
+
+							
 						%>
 						<tr>
 							<td>
@@ -191,12 +198,15 @@
 							</td>
 						</tr>
 						<%
-							}
+								}
+							}else{
 						%>
 						<tr>
 							<td colspan="6">데이터가 존재하지 않습니다.</td>
 						</tr>
-
+						<%
+							}
+						%>
 					</tbody>
 				</table>
 			</div>
@@ -205,40 +215,54 @@
 	</div>
 </div>
 <!-- main end-->
-<%-- <html>
+<!-- chart start -->
+<html>
   <head>
     <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
     <script type="text/javascript">
-      google.charts.load('current', {'packages':['corechart']});
-      google.charts.setOnLoadCallback(drawChart);
-      function drawChart() {
-        var data = google.visualization.arrayToDataTable([
-          ['Date', 'Open', 'High', 'Low', 'Close', 'Volume', 'Market Cap'],
-          <%
-           for (int i = 0; i < elements.size(); i++) {
-				Element trElement = elements.get(i);
-				out.println("[" + date, open, high, low, clow, volume, cap + "],");
-          
-          %>
-        ]);
-        var options = {
-          title: 'Company Performance',
-          curveType: 'function',
-          legend: { position: 'bottom' }
-        };
-        var chart = new google.visualization.LineChart(document.getElementById('curve_chart'));
-        chart.draw(data, options);
-      }
+    google.charts.load('current', {'packages':['line']});
+    google.charts.setOnLoadCallback(drawChart);
+
+  function drawChart() {
+
+    var data = new google.visualization.DataTable();
+    data.addColumn('Date', 'Close');
+    data.addColumn('Date', 'Market Cap');
+
+    data.addRows([
+    <%
+    for (int i = 0; i <= elements.size(); i++) {
+    	Element trElement = elements.get(i);
+    	if(i == elements.size()){
+    		out.printf("[%d, %f, %f]%n", Integer.valueOf(date), close, cap);
+    	}else{
+    		out.printf("[%d, %f, %f],%n", Integer.valueOf(date), close, cap);
+    	}
+    %>
+    ]);
+
+    var options = {
+      chart: {
+        title: 'BitCoin Chart',
+        subtitle: 'ok'
+      },
+      width: 900,
+      height: 500
+    };
+
+    var chart = new google.charts.Line(document.getElementById('linechart_material'));
+
+    chart.draw(data, google.charts.Line.convertOptions(options));
+  }
     </script>
   </head>
   <body>
     <div id="curve_chart" style="width: 900px; height: 500px"></div>
   </body>
 </html>
- --%>
 
 
 
-<!-- main end -->
+<!-- chart end -->
 
 <%@ include file="../inc/footer.jsp"%>

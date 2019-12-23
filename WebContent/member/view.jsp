@@ -13,29 +13,28 @@
 <!-- breadcrumb end-->
 <%
 	String tempPage = request.getParameter("page");
-	String tempNo = request.getParameter("no");
+	String tempMail = request.getParameter("email");
 	if (tempPage == null || tempPage.length() == 0) {
 		tempPage = "1";
 	}
-	if (tempNo == null || tempNo.length() == 0) {
+	if (tempMail == null || tempMail.length() == 0) {
 		response.sendRedirect("list.jsp?page=" + tempPage); // 이전페이지로 되돌리기
 		return;
 	}
 
 	int cPage = 0;
-	int no = 0;
+	String email = null;
 	try {
 		cPage = Integer.parseInt(tempPage);
 	} catch (NumberFormatException e) {
 		cPage = 1;
 	}
 	try {
-		no = Integer.parseInt(tempNo);
+		email = tempMail;
 	} catch (NumberFormatException e) {
 		response.sendRedirect("list.jsp?page=" + cPage);
 		return;
 	}
-	String email = null;
 	
 	MemberDao dao = MemberDao.getInstance();
 	MemberDto dto = dao.select(email);
@@ -43,10 +42,11 @@
 		response.sendRedirect("list.jsp?page=" + cPage);
 		return;
 	}
-	String email_ = dto.getEmail();
+	
 	String name = dto.getName();
 	String password = dto.getPassword();
 	String phone = dto.getPhone();
+	String regdate = dto.getRegdate();
 %>
 <!-- main start -->
 <div class="container">
@@ -64,7 +64,7 @@
 				<div class="form-group row">
 					<label for="email" class="col-sm-2 col-form-label">이메일</label>
 					<div class="col-sm-10">
-						<input type="email" class="form-control" id="email" readonly = "readonly" name="email" value="<%=email_%>">
+						<input type="email" class="form-control" id="email" readonly = "readonly" name="email" value="<%=email%>">
 						<div id="emailMessage"></div>
 					</div>
 				</div>
@@ -77,10 +77,26 @@
 					</div>
 				</div>
 				<div class="form-group row">
+					<label for="rePassword" class="col-sm-2 col-form-label">비밀번호
+						확인</label>
+					<div class="col-sm-10">
+						<input type="password" class="form-control" id="rePassword"
+							name="rePassword" value="">
+						<div id="rePasswordMessage"></div>
+					</div>
+				</div>
+				<div class="form-group row">
 					<label for="phone" class="col-sm-2 col-form-label">휴대폰번호</label>
 					<div class="col-sm-10">
 						<input type="tel" class="form-control" id="phone" name="phone" value="<%=phone%>">
 						<div id="phoneMessage"></div>
+					</div>
+				</div>
+				<div class="form-group row">
+					<label for="regdate" class="col-sm-2 col-form-label">가입날짜</label>
+					<div class="col-sm-10">
+						<input type="date" class="form-control" id="regdate" name="regdate"  readonly="readonly" value="<%=regdate%>">
+						<div id="nameMessage"></div>
 					</div>
 				</div>
 				<input type="hidden" name="checkEmail" id="checkEmail" value="no" />
@@ -100,7 +116,7 @@
 <script>
 	$(function() {
 		$("#name").focus();
-		$("#saveMember").click(function() {
+		$("#updateMember").click(function() {
 							//자바스크립트 유효성 검사
 							if ($("#name").val().length == 0) {
 								$("#name").addClass("is-invalid");
@@ -201,6 +217,11 @@
 				$("#phone").removeClass("is-invalid");
 				$("#phoneMessage").html('');
 				});
+			});
+			
+			$("#deleteMember").click(function() {
+				f.action = "delete.jsp";
+				f.submit();
 			});
 </script>
 
