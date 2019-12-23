@@ -11,49 +11,14 @@
 <html>
 <head>
 
-    <script src="https://code.jquery.com/jquery-3.2.1.js"></script>
-
-	<link rel="stylesheet" href="/css/jquery-ui.min.css">
-
-    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.2/css/bootstrap.min.css"/>
-
-    <script src="http://netdna.bootstrapcdn.com/bootstrap/3.0.3/js/bootstrap.min.js"></script>
-
-    <script type='text/javascript' src='//code.jquery.com/jquery-1.8.3.js'></script>
+<link rel="stylesheet"
+	href="//code.jquery.com/ui/1.8.18/themes/base/jquery-ui.css" />
+<script src="//ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
+<script src="//code.jquery.com/ui/1.8.18/jquery-ui.min.js"></script>
 
 
 
 
- 
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.5.0/css/bootstrap-datepicker3.min.css">
-
-    <script type='text/javascript' src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.5.0/js/bootstrap-datepicker.min.js"></script>
-
-    <script src="/js/bootstrap-datepicker.kr.js" charset="UTF-8"></script>
-
-
-
-    <script type='text/javascript'>
-
-    $(function(){
-
-        $('.input-group.date').datepicker({
-
-            calendarWeeks: false,
-
-            todayHighlight: true,
-
-            autoclose: true,
-
-            format: "yyyymmdd",
-
-            language: "kr"
-
-        });
-
-    });
-
-    </script>
 
 </head>
 </html>
@@ -62,37 +27,17 @@
 	int year = Calendar.getInstance().get(Calendar.YEAR);
 	int month = Calendar.getInstance().get(Calendar.MONTH);
 	int day = Calendar.getInstance().get(Calendar.DAY_OF_MONTH);
-	String zero = "0";
-
 	String bcoin = request.getParameter("coin");
 	if (bcoin == null) {
 		bcoin = "bitcoin";
 	}
 	String sDate = request.getParameter("startDate");
-	String sYear = request.getParameter("startYear");
-	if (sYear == null) {
-		sYear = year + "";
-	}
-	String sMonth = request.getParameter("startMonth");
-	if (sMonth == null) {
-		sMonth = "1";
-	}
-	String sDay = request.getParameter("startDay");
-	if (sDay == null) {
-		sDay = "1";
+	if (sDate == null) {
+		sDate = "20190101";
 	}
 	String eDate = request.getParameter("endDate");
-	String eYear = request.getParameter("endYear");
-	if (eYear == null) {
-		eYear = year + "";
-	}
-	String eMonth = request.getParameter("endMonth");
-	if (eMonth == null) {
-		eMonth = month + "";
-	}
-	String eDay = request.getParameter("endDay");
-	if (eDay == null) {
-		eDay = day + "";
+	if (bcoin == null) {
+		eDate = "20191220";
 	}
 %>
 <!-- breadcrumb start-->
@@ -128,34 +73,43 @@
 					</div>
 				</div>
 				<html>
-				<body>
-					<script type="text/javascript">
-						$(function() {
-							$('#datepicker1').datepicker(function() {
-								f.submit();
-							});
-						});
-					</script>
-					<p>
-						시작날짜 : <input type="text" id="datepicker1" />
-					</p>
-					<p>
-						끝날짜 : <input type="text" id="datepicker1" />
-					</p>
-				</body>
+<body>
+	<p>
+		시작날짜 : <input type="text" id="datepicker1" />
+	</p>
+	<p>
+		끝날짜 : <input type="text" id="datepicker2" />
+	</p>
+	<script type='text/javascript'>
+		$.datepicker.setDefaults({
+			dateFormat : 'yymmdd',
+			prevText : '이전 달',
+			nextText : '다음 달',
+			monthNames : [ '1월', '2월', '3월', '4월', '5월', '6월', '7월', '8월',
+					'9월', '10월', '11월', '12월' ],
+			monthNamesShort : [ '1월', '2월', '3월', '4월', '5월', '6월', '7월', '8월',
+					'9월', '10월', '11월', '12월' ],
+			dayNames : [ '일', '월', '화', '수', '목', '금', '토' ],
+			dayNamesShort : [ '일', '월', '화', '수', '목', '금', '토' ],
+			dayNamesMin : [ '일', '월', '화', '수', '목', '금', '토' ],
+			showMonthAfterYear : true,
+			yearSuffix : '년'
+		});
+
+		$("#datepicker1, #datepicker2").datepicker();
+		$(function() {
+			$("#searchCoin").click(function() {
+				f.submit();
+			});
+		});
+		
+	</script>
+</body>
 				</html>
 				<div class="text-right">
 					<button id="searchCoin" class="btn btn-outline-success">검색</button>
 				</div>
 			</form>
-
-			<script>
-				$(function() {
-					$("#searchCoin").click(function() {
-						f.submit();
-					});
-				});
-			</script>
 			<div class="table-responsive-lg">
 				<table class="table table-hover">
 					<colgroup>
@@ -180,9 +134,7 @@
 					</thead>
 					<tbody>
 						<%
-							String url = "https://coinmarketcap.com/currencies/" + bcoin + "/historical-data/?start=" + sDate + "&end="
-									+ eDate + "01";
-
+							String url = "https://coinmarketcap.com/currencies/" + bcoin + "/historical-data/?start=" + sDate + "&end=" + eDate;
 							Document doc = null;
 							try {
 								doc = Jsoup.connect(url).get();
@@ -259,7 +211,6 @@
     <script type="text/javascript">
       google.charts.load('current', {'packages':['corechart']});
       google.charts.setOnLoadCallback(drawChart);
-
       function drawChart() {
         var data = google.visualization.arrayToDataTable([
           ['Date', 'Open', 'High', 'Low', 'Close', 'Volume', 'Market Cap'],
@@ -270,15 +221,12 @@
           
           %>
         ]);
-
         var options = {
           title: 'Company Performance',
           curveType: 'function',
           legend: { position: 'bottom' }
         };
-
         var chart = new google.visualization.LineChart(document.getElementById('curve_chart'));
-
         chart.draw(data, options);
       }
     </script>

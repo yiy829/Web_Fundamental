@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>step04_ajax_jquery_jsonp</title>
+<script src="../js/jquery-3.4.1.js"></script>
+<script>
+$(function(){
+	$("#loadAjax").click(function() {
+		$.ajax({
+			type : 'GET',
+			url : 'http://acornacademy.co.kr/blockchain/naver_json.jsp', // 조건 : 반드시 url이 jsonp가 지원되야됌
+			dataType : 'jsonp',
+			jsonp : 'call', // 키값이 call을 통해 jsonp 함수로 감싸준다.
+			error : function() {
+				alert('Json Load Error');
+			},
+			success : function(obj) {
+				console.log(obj);
+				console.log(typeof obj);
+				$("#sung").html(JSON.stringify(obj));
+			}
+		});
+	});
+
+
+});
+</script>
+</head>
+<body>
+	<div id="sung"></div>
+	<button id="loadAjax">Ajax 불러오기</button>
+</body>
+</html>
