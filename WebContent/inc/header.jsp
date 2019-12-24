@@ -1,3 +1,4 @@
+<%@page import="kr.co.acorn.dto.MemberDto"%>
 <%@ page pageEncoding="utf-8"%>
 <!doctype html>
 <html lang="en">
@@ -19,6 +20,7 @@
       	<%
       		// /dept/list.jsp,	/emp/list.jsp,	/notice/list.jsp
       		String uri = request.getRequestURI();
+      		
       	%>
         <div class="collapse navbar-collapse" id="navbarTogglerDemo02">
           <ul class="navbar-nav mr-auto mt-2 mt-lg-0">
@@ -31,15 +33,35 @@
             <li class="nav-item <%if(uri.startsWith("/crawling")){%>active<%}%>">
               <a class="nav-link" href="/crawling/list.jsp">크롤링 </a>
             </li>
-            <li class="nav-item <%if(uri.startsWith("/notice")){%>active<%}%>">
-              <a class="nav-link" href="/notice/list.jsp">공지사항</a>
+            <li class="nav-item <%if(uri.startsWith("/member")){%>active<%}%>">
+              <a class="nav-link" href="/member/list.jsp">회원관리</a>
+            </li>
+            <li class="nav-item <%if(uri.startsWith("/member")){%>active<%}%>">
+              <a class="nav-link" href="/file/index.jsp">파일업로드</a>
             </li>
             
           </ul>
-          <form class="form-inline my-2 my-lg-0">
-            <input class="form-control mr-sm-2" type="search" placeholder="Search">
-            <button class="btn btn-outline-success my-2 my-sm-0" type="submit">Search</button>
-          </form>
+          <ul class = "navbar-nav">
+          <%
+          	MemberDto memberDto = (MemberDto)session.getAttribute("member");
+          	if(memberDto == null){
+          
+          %>
+          	<li class = "nav-item">
+          		<a class="nav-link" href="/member/write.jsp">회원가입</a>
+          	</li>
+          	<li class = "nav-item">
+          		<a class="nav-link" href="/member/login.jsp">로그인</a>
+          	</li>
+          <%}else{%>
+          	<li class = "nav-item">
+          		<a class="nav-link" href="/member/logout.jsp"><%=memberDto.getName() %>님 환영합니다.</a>
+          	</li>
+          	<li class = "nav-item">
+          		<a class="nav-link" href="/member/logout.jsp">로그아웃</a>
+          	</li>
+          <%}%>
+          </ul>
         </div>
       </nav>
     <!-- Navbar End-->

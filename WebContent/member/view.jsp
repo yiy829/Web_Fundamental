@@ -64,25 +64,8 @@
 				<div class="form-group row">
 					<label for="email" class="col-sm-2 col-form-label">이메일</label>
 					<div class="col-sm-10">
-						<input type="email" class="form-control" id="email" readonly = "readonly" name="email" value="<%=email%>">
+						<input type="email" class="form-control" id="email" name="email" value="<%=email%>">
 						<div id="emailMessage"></div>
-					</div>
-				</div>
-				<div class="form-group row">
-					<label for="password" class="col-sm-2 col-form-label">비밀번호</label>
-					<div class="col-sm-10">
-						<input type="password" class="form-control" id="password"
-							name="password" value="<%=password%>">
-						<div id="passwordMessage"></div>
-					</div>
-				</div>
-				<div class="form-group row">
-					<label for="rePassword" class="col-sm-2 col-form-label">비밀번호
-						확인</label>
-					<div class="col-sm-10">
-						<input type="password" class="form-control" id="rePassword"
-							name="rePassword" value="">
-						<div id="rePasswordMessage"></div>
 					</div>
 				</div>
 				<div class="form-group row">
@@ -95,7 +78,7 @@
 				<div class="form-group row">
 					<label for="regdate" class="col-sm-2 col-form-label">가입날짜</label>
 					<div class="col-sm-10">
-						<input type="date" class="form-control" id="regdate" name="regdate"  readonly="readonly" value="<%=regdate%>">
+						<input type="text" class="form-control" id="regdate" name="regdate" readonly="readonly" value="<%=regdate%>">
 						<div id="nameMessage"></div>
 					</div>
 				</div>

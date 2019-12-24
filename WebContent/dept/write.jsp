@@ -47,7 +47,9 @@
 			</form>
 			<div class="text-right">
 				<a href="list.jsp?page=<%=cPage %>" class="btn btn-outline-primary">목록</a>
+				<%if(memberDto != null){ %>
 				<button type="button" id="saveDept" class="btn btn-outline-success">저장</button>
+				<%} %>
 			</div>
 		</div>
 	</div>

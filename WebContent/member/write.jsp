@@ -69,8 +69,7 @@
 			</form>
 			<div class="text-right">
 				<a href="list.jsp?page=<%=cPage%>" class="btn btn-outline-primary">목록</a>
-				<button type="button" id="saveMember"
-					class="btn btn-outline-success">저장</button>
+				<button type="button" id="saveMember" class="btn btn-outline-success">저장</button>
 			</div>
 		</div>
 	</div>
